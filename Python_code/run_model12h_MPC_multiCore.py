@@ -108,7 +108,7 @@ LengthScaleFactor = 1 #This will multiply all linear scales of the model
     #appropriately to modify the size of the model.
 LengthExtend = 0 #This will lengthen the difference between the two masses.
 
-L1 = LengthScaleFactor*0.908 #Length from the thorax-abdomen joint to 
+L1 = LengthScaleFactor*0.9 #Length from the thorax-abdomen joint to 
     #the center of the head-thorax mass in cm.
     
 if treatment[1] == 's':
@@ -120,13 +120,13 @@ else:
     L3 = L1 #Length from the thorax-abdomen joint to the aerodynamic force 
                 #vector in cm
 
-ahead = LengthScaleFactor*0.908 #Major axis of the head-thorax ellipsoid
+ahead = LengthScaleFactor*0.9 #Major axis of the head-thorax ellipsoid
     #in cm.
-abutt = LengthScaleFactor*1.7475 #Major axis of the abdomen ellipsoid
+abutt = LengthScaleFactor*1.9 #Major axis of the abdomen ellipsoid
     #in cm.
-bhead = LengthScaleFactor*0.507 #Minor axis of the head-thorax ellipsoid
+bhead = LengthScaleFactor*0.5 #Minor axis of the head-thorax ellipsoid
     #in cm.
-bbutt = LengthScaleFactor*0.1295 #Minor axis of the abdomen ellipsoid
+bbutt = LengthScaleFactor*0.75 #Minor axis of the abdomen ellipsoid
     #in cm.
 
 L_petiole = LengthExtend*(2*(ahead+abutt)) #Length of petiole extension as a 
@@ -134,11 +134,12 @@ L_petiole = LengthExtend*(2*(ahead+abutt)) #Length of petiole extension as a
 L2 = abutt + L_petiole #Length from the thorax-abdomen 
     #joint to the center of the abdomen mass in cm
 
-K = LengthScaleFactor*29.3  #K is the torsional spring constant of 
+K = LengthScaleFactor*23000  #K is the torsional spring constant of 
     #the thorax-petiole joint in (cm^2)*g/(rad*(s^2))
 c = LengthScaleFactor*14075.8 #c is the torsional damping constant of 
     #the thorax-petiole joint in (cm^2)*g/s
-rho = 1.0 #The density of the insect in g/(cm^3)
+rho_head = 0.9 #The density of the head-thorax in g/(cm^3)
+rho_butt = 0.4 #The density of the abdomen in g/(cm^3)
 rhoA = 1.18*10**(-3) #The density of the air in g/(cm^3)
 muA = 1.86*10**(-4) #The dynamic viscosity of air at 27C in in g/(cm*s)
 g = 980.0 #g is the acceleration due to gravity in cm/(s^2)
@@ -272,8 +273,8 @@ betaR = q0_og[3] - q0_og[2] - np.pi #This is the resting configuration of our
 tsExp = int(1) #This is the torsional spring exponent. MUST be an odd number.
     
 # %% Calculated inertial properies of the simulated insect
-m1 = rho*(4/3)*np.pi*(bhead**2)*ahead #m1 is the mass of the head-thorax
-m2 = rho*(4/3)*np.pi*(bbutt**2)*abutt #m2 is the mass of the abdomen 
+m1 = rho_head*(4/3)*np.pi*(bhead**2)*ahead #m1 is the mass of the head-thorax
+m2 = rho_butt*(4/3)*np.pi*(bbutt**2)*abutt #m2 is the mass of the abdomen 
                 #(petiole + gaster)
 echead = ahead/bhead #Eccentricity of head-thorax (unitless)
 ecbutt = abutt/bbutt #Eccentricity of gaster (unitless)
@@ -291,12 +292,13 @@ S_head = np.pi*(bhead**2) #This is the surface area of the object
 S_butt = np.pi*(bbutt**2) #This is the surface area of the object 
                 #experiencing drag. In this case, it is modeled as a sphere.
                 
-# %% Define global variables
+# %% Define parametric dictionary of variables
 parDict = OrderedDict({"L1": L1, "L2": L2, "L3": L3, "L_petiole": L_petiole, 
               "ahead": ahead, "abutt": abutt, "bhead": bhead, "bbutt": bbutt,
-              "K": K, "c": c, "rho": rho, "rhoA": rhoA, "muA": muA, "g": g,
-              "m1": m1, "m2": m2, "echead": echead, "ecbutt": ecbutt, "I1": I1,
-              "I2": I2, "S_head": S_head, "S_butt": S_butt, "betaR": betaR, 
+              "K": K, "c": c, "rho_head": rho_head, "rho_butt": rho_butt, 
+              "rhoA": rhoA, "muA": muA, "g": g, "m1": m1, "m2": m2, 
+              "echead": echead, "ecbutt": ecbutt, "I1": I1, "I2": I2, 
+              "S_head": S_head, "S_butt": S_butt, "betaR": betaR, 
               "tsExp": tsExp})
 
 # Convert the dictionary to a list. Apparently @jit needs arrays or lists

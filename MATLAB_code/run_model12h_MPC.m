@@ -80,13 +80,13 @@ else
         %aerodynamic force vector in cm 
 end
 
-par.ahead = LengthScaleFactor*0.908; %Major axis of head-thorax ellipsoid 
+par.ahead = LengthScaleFactor*0.9; %Major axis of head-thorax ellipsoid 
     %in cm
-par.abutt = LengthScaleFactor*1.7475; %Major axis of abdomen ellipsoid
+par.abutt = LengthScaleFactor*1.9; %Major axis of abdomen ellipsoid
     %in cm
-par.bhead = LengthScaleFactor*0.507; %Minor axis of head-thorax ellipsoid 
+par.bhead = LengthScaleFactor*0.5; %Minor axis of head-thorax ellipsoid 
     %in cm
-par.bbutt = LengthScaleFactor*0.1295; %Minor axis of abdomen ellipsoid 
+par.bbutt = LengthScaleFactor*0.75; %Minor axis of abdomen ellipsoid 
     %in cm
       
 par.L_petiole = LengthExtend*(2*(par.ahead + par.abutt)); %Length of 
@@ -98,7 +98,8 @@ par.K = LengthScaleFactor*29.3; %K is the torsional spring constant of
           %the thorax-petiole joint in (cm^2)*g/(rad*(s^2))
 par.c = LengthScaleFactor*14075.8; %c is the torsional damping constant of 
             %the thorax-petiole joint in (cm^2)*g/s
-par.rho = 1; %The density of the insect in g/(cm^3)
+par.rho_head = 0.9; %The density of the insect in g/(cm^3)
+par.rho_butt = 0.4; %The density of the insect in g/(cm^3)
 par.rhoA = 1.18*10^-3; %The density of air in g/(cm^3)
 par.muA = 1.86*10^-4; %The dynamic viscosity of air at 27C in g/(cm*s)
 par.g = 980; %g is the acceleration due to gravity in cm/(s^2)
@@ -221,9 +222,9 @@ par.betaR = q0_og(4) - q0_og(3) - pi; %This is the resting configuration of our
 
 %Masses and moment of inertias in terms of insect density and eccentricity
 %of the head/thorax & gaster
-par.m1 = par.rho*(4/3)*pi*(par.bhead^2)*par.ahead; %m1 is the mass of the 
+par.m1 = par.rho_head*(4/3)*pi*(par.bhead^2)*par.ahead; %m1 is the mass of the 
     %head-thorax (in cm)
-par.m2 = par.rho*(4/3)*pi*(par.bbutt^2)*par.abutt; %m2 is the mass of the 
+par.m2 = par.rho_butt*(4/3)*pi*(par.bbutt^2)*par.abutt; %m2 is the mass of the 
     %abdomen (in cm) (petiole + gaster)
 par.echead = par.ahead/par.bhead; %Eccentricity of head-thorax (unitless)
 par.ecbutt = par.abutt/par.bbutt; %Eccentricity of gaster (unitless)
@@ -311,15 +312,25 @@ PartPath(1:numOfTrajectories) = struct('ICs',q0,'F',0,'alpha',0,'tau0',0,...
         PartPath(r_i).alpha = 2*pi*rand(1); %alpha is the angle of the 
             %aerodynamic vector with respect to the head-thorax mid-line 
             %in radians
-        PartPath(r_i).tau0 = 1000000*(2*(rand(1)-0.5))*(LengthScaleFactor^4); 
-            %The initial abdominal torque applied in g*(cm^2)/(s^2)
+        %Abdominal torque
+            if LengthScaleFactor > 1
+                PartPath(r_i).tau0 = 100000*(2*(rand(1)-0.5))*(LengthScaleFactor^4); 
+                %The initial abdominal torque applied in g*(cm^2)/(s^2)
+            elseif LengthScaleFactor == 1
+                PartPath(r_i).tau0 = 1000000*(2*(rand(1)-0.5))*(LengthScaleFactor^4); 
+                %The initial abdominal torque applied in g*(cm^2)/(s^2)
+            elseif LengthScaleFactor < 1 
+                PartPath(r_i).tau0 = 1000000*(2*(rand(1)-0.5)); 
+                %The initial abdominal torque applied in g*(cm^2)/(s^2)
+            end         
+        %Wing torque 
             if treatment(1) == 'f'
                 PartPath(r_i).tau_w = 100000*(2*(rand(1)-0.5))*(LengthScaleFactor^4); 
                 %The initial wing torque applied in g*(cm^2)/(s^2)
             else
                 PartPath(r_i).tau_w = 0; 
                 %The initial wing torque applied in g*(cm^2)/(s^2)
-            end
+            end    
     end
     
 %Define the goal criteria for y and ydot BEFORE the parfor loop

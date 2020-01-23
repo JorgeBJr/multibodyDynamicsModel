@@ -5,8 +5,8 @@ from numba import jit
 ## The MATLAB version is "myODE_5.m"
 @jit(cache = True)
 def myODE_5(Q, t_spray, F, alpha, tau0, tau_w, L1, L2, L3, L_petiole, ahead, 
-            abutt, bhead, bbutt, K, c, rho, rhoA, muA, g, m1, m2, echead, 
-            ecbutt, I1, I2, S_head, S_butt, betaR, tsExp):
+            abutt, bhead, bbutt, K, c, rho_head, rho_butt, rhoA, muA, g, m1, 
+            m2, echead, ecbutt, I1, I2, S_head, S_butt, betaR, tsExp):
     #Unpack the state vector (THE ORDER MATTERS)
     x, y, theta, phi, xd, yd, thetad, phid = Q 
     

@@ -18,7 +18,6 @@ L2 = par.L2; %Length from the thorax-abdomen joint to the center of the
 %     %body length.
 L3 = par.L3; %Length from the thorax-abdomen joint to the aerodynamic force 
     %vector in cm
-% rho = par.rho; %The density of the insect in g/(cm^3)
 rhoA = par.rhoA; %The density of air in g/(cm^3)
 muA = par.muA; %The dynamic viscosity of air at 27C in g/(cm*s)
 % ahead = par.ahead; %Major axis of head-thorax ellipsoid in cm
