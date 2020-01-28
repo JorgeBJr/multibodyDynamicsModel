@@ -48,14 +48,13 @@
 #         decorator in the numba package to use multi-processing.
 #     5/1/19- Went back to global variables (I know, it's not the best 
 #         practice, but I have no patience at this time).
-#     5/17/19- Got the sucker to run with huge help from Callin Switzer. Woo!
+#     5/17/19- Got the sucker to run on Python with huge help from Callin 
+#         Switzer. Woo!
 #     5/22/19- Made significant changes. The model now outputs a dictionary, 
 #         which is useful, and directly applicable to my MATLAB code.
-# 
-#     12b is for horizontal aggressive maneuver
-#     12c is for vertical aggressive maneuver
-#     12h is for sum of prime number sines
-
+#     1/24/20- Made significant changes to the moth parametrics (i.e. body 
+#         lengths)
+#
 # %% The python preamble
 ## We the People, in Order to form a perfect Union,...
 #import matplotlib.pyplot as plt
@@ -345,7 +344,7 @@ for nn in np.arange(1,FullRuns+1):
             #the head-thorax mid-line in radians
         
         #tau0: The magnitude (and direction) of the applied abdominal torque
-        tau0_array = (100000*10*(2*(np.random.rand(numOfTrajectories)-0.5))*(LengthScaleFactor**4))
+        tau0_array = (100000*(2*(np.random.rand(numOfTrajectories)-0.5))*(LengthScaleFactor**4))
             #The applied abdominal torque in g*(cm^2)/(s^2)
             
         #tau_w: The magnitude (and direction) of the applied wing torque
