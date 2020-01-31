@@ -464,20 +464,46 @@ runtime_diff = tstamp_endLoop - tstamp_beginLoop
 print("Time at the end of the loop: ", tstamp_endLoop)
 print("Total run time is: ", runtime_diff)
 
-# %% Plot the trajectories
+# %% Plot tau_abdo and beta
+
+tau_abdo_all = [None]*int(len(Winstore))
+beta_all = [None]*int(len(y_g-100))
+
+#Define the interval size for each beta segment
+beta_interval = np.arange(0,len(y_g)-100,25)
 
 plt.figure(1)
 for w in np.arange(0,len(Winstore)):
-    x_prac = np.array(Winstore[w]['bigQ'][:,0])
-    y_prac = np.array(Winstore[w]['bigQ'][:,1])
-    plt.plot(x_prac,y_prac)
-plt.xlabel("x (cm)")
-plt.ylabel("y (cm)")
+    tau_abdo_all[w] = np.array(Winstore[w]['tau0'])
+
+plt.plot(tau_abdo_all)
+plt.xlabel("Time (not seconds)")
+plt.ylabel("Abdominal torque (g*(cm^2)/(s^2))")
+
+
+for ww in np.arange(0,len(Winstore)):
+    beta_temp = Winstore[ww]['bigQ'][:,3] - Winstore[ww]['bigQ'][:,2] - np.pi
+    beta_all[beta_interval[ww]:(beta_interval[ww]+24)] = beta_temp[range(0,24)]
+
+plt.figure(2)
+plt.plot(beta_all)
+plt.xlabel("Time units (not seconds)")
+plt.ylabel("Flexion (radians)")
+
+# %% Plot the trajectories (Not really necessary)
+#
+#plt.figure(3)
+#for w in np.arange(0,len(Winstore)):
+#    x_prac = np.array(Winstore[w]['bigQ'][:,0])
+#    y_prac = np.array(Winstore[w]['bigQ'][:,1])
+#    plt.plot(x_prac,y_prac)
+#plt.xlabel("x (cm)")
+#plt.ylabel("y (cm)")
 
 # %% Plot the time elapsed to generate each set of sprays
 time_prac = [None]*int(len(Winstore))
 
-plt.figure(2)
+plt.figure(4)
 for mm in np.arange(0,len(Winstore)):
     time_prac[mm] = Winstore[mm]['runTime']
 plt.plot(time_prac)
