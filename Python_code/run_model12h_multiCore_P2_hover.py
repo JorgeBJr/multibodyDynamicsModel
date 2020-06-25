@@ -54,6 +54,7 @@
 #         which is useful, and directly applicable to my MATLAB code.
 #     1/24/20- Made significant changes to the moth parametrics (i.e. body 
 #         lengths)
+#     2020/6/24- Code modified for hovering task (Paper 2)
 #
 # %% The python preamble
 ## We the People, in Order to form a perfect Union,...
@@ -221,31 +222,10 @@ prime_f = np.array([0.2, 0.3, 0.5, 0.7, 1.1, 1.7, 2.9, 4.3, 7.9, 13.7, 19.9]) #i
 prime_a = (signal_amp/(2*np.pi*prime_f))*(2*np.pi*prime_f[0]) #in cm
 
 #y-motion goal criteria (for the cost function)
-y_g = (prime_a[0]*np.sin(2*np.pi*prime_f[0]*Tstore)
-+prime_a[1]*np.sin(2*np.pi*prime_f[1]*Tstore)
-+prime_a[2]*np.sin(2*np.pi*prime_f[2]*Tstore)
-+prime_a[3]*np.sin(2*np.pi*prime_f[3]*Tstore)
-+prime_a[4]*np.sin(2*np.pi*prime_f[4]*Tstore)
-+prime_a[5]*np.sin(2*np.pi*prime_f[5]*Tstore)
-+prime_a[6]*np.sin(2*np.pi*prime_f[6]*Tstore)
-+prime_a[7]*np.sin(2*np.pi*prime_f[7]*Tstore)
-+prime_a[8]*np.sin(2*np.pi*prime_f[8]*Tstore)
-+prime_a[9]*np.sin(2*np.pi*prime_f[9]*Tstore)
-+prime_a[10]*np.sin(2*np.pi*prime_f[10]*Tstore)) #in cm
+y_g = 0 #in cm
     
 #ydot-motion goal criteria (for the cost function)    
-ydot_g = (2*np.pi*prime_a[0]*prime_f[0]*np.cos(2*np.pi*prime_f[0]*Tstore)
-+2*np.pi*prime_a[1]*prime_f[1]*np.cos(2*np.pi*prime_f[1]*Tstore)
-+2*np.pi*prime_a[2]*prime_f[2]*np.cos(2*np.pi*prime_f[2]*Tstore)
-+2*np.pi*prime_a[3]*prime_f[3]*np.cos(2*np.pi*prime_f[3]*Tstore)
-+2*np.pi*prime_a[4]*prime_f[4]*np.cos(2*np.pi*prime_f[4]*Tstore)
-+2*np.pi*prime_a[5]*prime_f[5]*np.cos(2*np.pi*prime_f[5]*Tstore)
-+2*np.pi*prime_a[6]*prime_f[6]*np.cos(2*np.pi*prime_f[6]*Tstore)
-+2*np.pi*prime_a[7]*prime_f[7]*np.cos(2*np.pi*prime_f[7]*Tstore)
-+2*np.pi*prime_a[8]*prime_f[8]*np.cos(2*np.pi*prime_f[8]*Tstore)
-+2*np.pi*prime_a[9]*prime_f[9]*np.cos(2*np.pi*prime_f[9]*Tstore)
-+2*np.pi*prime_a[10]*prime_f[10]*np.cos(2*np.pi*prime_f[10]*Tstore))
-        #in cm/s
+ydot_g = 0 #in cm/s
 
 #Weighting coefficients (AS OF 2019/05/10)
 #c1 = x,    c2 = y,      c3 = theta,  c4 = xdot,   c5 = ydot,   c6 = thetadot
@@ -357,12 +337,12 @@ for nn in np.arange(1,FullRuns+1):
                         #The applied abdominal torque in g*(cm^2)/(s^2)
         
         #Define the goal criteria for y and ydot BEFORE the parallelized loop
-        y_g_thisPartPath = y_g[int(goal_index[i])]; #in cm
-        ydot_g_thisPartPath = ydot_g[int(goal_index[i])] #in cm/s
+#        y_g_thisPartPath = y_g[int(goal_index[i])]; #in cm
+#        ydot_g_thisPartPath = ydot_g[int(goal_index[i])] #in cm/s
         
         #Pack goal criteria for this particular half wing stroke
-        goalCriteria = np.array([x_g, y_g_thisPartPath, theta_g, xdot_g, 
-                                 ydot_g_thisPartPath, thetadot_g])
+        goalCriteria = np.array([x_g, y_g, theta_g, 
+                                 xdot_g, ydot_g, thetadot_g])
         
         PartPath = [None]*int(numOfTrajectories) #This will be a 4 x 1 list
         
@@ -466,16 +446,16 @@ print("Total run time is: ", runtime_diff)
 # %% Plot tau_abdo and beta
 
 tau_abdo_all = [None]*int(len(Winstore))
-beta_all = [None]*int(len(y_g-100))
+beta_all = [None]*int(len(Winstore)*25)
 
 #Define the interval size for each beta segment
-beta_interval = np.arange(0,len(y_g)-100,25)
+beta_interval = np.arange(0,len(Winstore)*25,25)
 
 plt.figure(1)
 for w in np.arange(0,len(Winstore)):
     tau_abdo_all[w] = np.array(Winstore[w]['tau0'])
 
-plt.plot(tau_abdo_all)
+plt.plot(tau_abdo_all, 'ko')
 plt.xlabel("Time (not seconds)")
 plt.ylabel("Abdominal torque (g*(cm^2)/(s^2))")
 
@@ -491,13 +471,13 @@ plt.ylabel("Flexion (radians)")
 
 # %% Plot the trajectories (Not really necessary)
 #
-#plt.figure(3)
-#for w in np.arange(0,len(Winstore)):
-#    x_prac = np.array(Winstore[w]['bigQ'][:,0])
-#    y_prac = np.array(Winstore[w]['bigQ'][:,1])
-#    plt.plot(x_prac,y_prac)
-#plt.xlabel("x (cm)")
-#plt.ylabel("y (cm)")
+plt.figure(3)
+for w in np.arange(0,len(Winstore)):
+    x_prac = np.array(Winstore[w]['bigQ'][:,0])
+    y_prac = np.array(Winstore[w]['bigQ'][:,1])
+    plt.plot(x_prac,y_prac)
+plt.xlabel("x (cm)")
+plt.ylabel("y (cm)")
 
 # %% Plot the time elapsed to generate each set of sprays
 time_prac = [None]*int(len(Winstore))
